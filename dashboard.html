@@ -1,0 +1,246 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-key="dashboard_page_title">Dashboard - IA Consultores</title>
+    
+    <!-- Estilos y Fuentes -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos adicionales para una apariencia más profesional */
+        .sidebar .nav-link.active, .sidebar .nav-link:hover {
+            background-color: #e9ecef;
+            color: #0d6efd;
+            border-left: 4px solid #0d6efd;
+        }
+        .card {
+            transition: transform .2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+
+    <script>
+        (function() {
+            const lang = localStorage.getItem('language') || 'es';
+            document.documentElement.lang = lang;
+        })();
+    </script>
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary" href="index.html" data-key="brand_name">IA Consultores</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="#" data-key="notifications"><i class="bi bi-bell-fill"></i> Notificaciones</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="#" data-key="settings"><i class="bi bi-gear-fill"></i> Ajustes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="#" data-key="logout"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+                    </li>
+                </ul>
+                <div class="dropdown ms-3">
+                    <button class="btn btn-light border fw-semibold d-flex align-items-center gap-2" id="langDropdownBtn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img id="langDropdownFlag" src="" width="24" alt="" class="rounded-circle border">
+                        <span id="langDropdownText"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" id="langDropdownMenu">
+                        <li><a class="dropdown-item d-flex align-items-center gap-2" href="#" data-lang="es"><img src="https://flagcdn.com/es.svg" width="24" alt="Español" class="rounded-circle border"> Español</a></li>
+                        <li><a class="dropdown-item d-flex align-items-center gap-2" href="#" data-lang="en"><img src="https://flagcdn.com/us.svg" width="24" alt="English" class="rounded-circle border"> English</a></li>
+                        <li><a class="dropdown-item d-flex align-items-center gap-2" href="#" data-lang="pt"><img src="https://flagcdn.com/br.svg" width="24" alt="Português" class="rounded-circle border"> Português</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
+                <div class="position-sticky pt-4">
+                    <div class="text-center mb-4">
+                        <img src="https://via.placeholder.com/100" alt="Foto de Perfil" class="rounded-circle img-fluid mb-2">
+                        <h5 class="fw-bold">Bienvenido, {{ user.name }}</h5>
+                        <p class="text-muted small">{{ user.role }}</p>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link active" href="#" data-key="dash_summary"><i class="bi bi-house-door-fill me-2"></i> Resumen</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-key="dash_projects"><i class="bi bi-briefcase-fill me-2"></i> Mis Proyectos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-key="dash_reports"><i class="bi bi-file-earmark-bar-graph-fill me-2"></i> Informes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-key="dash_analytics"><i class="bi bi-graph-up-arrow me-2"></i> Analíticas</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-key="dash_profile"><i class="bi bi-person-circle me-2"></i> Mi Perfil</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Contenido del Dashboard -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" data-key="dash_welcome_title">Dashboard de Cliente</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-key="export">Exportar</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-key="share">Compartir</button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-key="date_range"><i class="bi bi-calendar3"></i> Rango de Fechas</button>
+                    </div>
+                </div>
+
+                <!-- Tarjetas de Resumen -->
+                <div class="row">
+                    <div class="col-md-4"><div class="card text-white bg-primary mb-3"><div class="card-header fw-bold">Proyectos Activos</div><div class="card-body"><h2 class="card-title">{{ projects.active }}</h2><p class="card-text">Proyectos en desarrollo.</p></div></div></div>
+                    <div class="col-md-4"><div class="card text-white bg-success mb-3"><div class="card-header fw-bold">Tareas Completadas</div><div class="card-body"><h2 class="card-title">{{ tasks.completed }}</h2><p class="card-text">Tareas finalizadas este mes.</p></div></div></div>
+                    <div class="col-md-4"><div class="card text-white bg-warning mb-3"><div class="card-header fw-bold">Alertas Pendientes</div><div class="card-body"><h2 class="card-title">{{ alerts.pending }}</h2><p class="card-text">Notificaciones importantes.</p></div></div></div>
+                </div>
+
+                <!-- Gráfico de Actividad -->
+                <div class="card my-4">
+                    <div class="card-header fw-bold">Actividad Reciente</div>
+                    <div class="card-body"><canvas id="activityChart"></canvas></div>
+                </div>
+
+                <!-- Tabla de Proyectos Recientes -->
+                <div class="card">
+                    <div class="card-header fw-bold">Proyectos Recientes</div>
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Proyecto</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Progreso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>Desarrollo de API</td>
+                                    <td><span class="badge bg-success">Completado</span></td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>Migración de Base de Datos</td>
+                                    <td><span class="badge bg-warning text-dark">En Progreso</span></td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <td>Diseño de UI/UX</td>
+                                    <td><span class="badge bg-danger">Retrasado</span></td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'languages.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lógica de traducción
+            const langInfo = { es: { flag: "https://flagcdn.com/es.svg", name: "Español" }, en: { flag: "https://flagcdn.com/us.svg", name: "English" }, pt: { flag: "https://flagcdn.com/br.svg", name: "Português" } };
+            let currentLang = localStorage.getItem('language') || 'es';
+            function setLanguage(lang) {
+                document.documentElement.lang = lang;
+                document.querySelectorAll('[data-key]').forEach(el => { if (translations[lang]?.[el.dataset.key]) el.textContent = translations[lang][el.dataset.key]; });
+                if (langInfo[lang]) {
+                    document.getElementById('langDropdownFlag').src = langInfo[lang].flag;
+                    document.getElementById('langDropdownText').textContent = langInfo[lang].name;
+                }
+                localStorage.setItem('language', lang);
+            }
+            document.getElementById('langDropdownMenu').addEventListener('click', e => { const langItem = e.target.closest('[data-lang]'); if (langItem) { e.preventDefault(); setLanguage(langItem.dataset.lang); } });
+            setLanguage(currentLang);
+
+            // Gráfico mejorado
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+                    datasets: [
+                        {
+                            label: 'Tareas Completadas',
+                            data: [12, 19, 3, 5, 2, 3],
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            borderColor: 'rgba(0, 123, 255, 1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Proyectos Iniciados',
+                            data: [1, 2, 1, 3, 0, 1],
+                            backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                            borderColor: 'rgba(25, 135, 84, 1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } },
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+
+            // Interacción del Sidebar
+            const sidebarLinks = document.querySelectorAll('#sidebar .nav-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sidebarLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

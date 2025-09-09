@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-key="login_page_title">Portal de Clientes - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Ocultar el contenido hasta que se carguen las traducciones
+        document.documentElement.style.visibility = 'hidden';
+        
+        (function() {
+            const lang = localStorage.getItem('language') || 'es';
+            document.documentElement.lang = lang;
+        })();
+    </script>
+</head>
+<body>
+
+    <div class="container-fluid vh-100 p-0">
+        <div class="row g-0 h-100">
+            <div class="col-lg-7 d-none d-lg-block login-image-side"></div>
+
+            <div class="col-lg-5 d-flex flex-column align-items-center justify-content-center bg-light">
+                <div class="login-form-container p-4">
+                    <div class="text-center mb-4">
+                        <a class="navbar-brand fw-bold fs-2" href="index.html" data-key="brand_name">IA Consultores</a>
+                    </div>
+
+                    <h1 class="card-title text-center mb-2" data-key="login_welcome">Bienvenido de Vuelta</h1>
+                    <p class="text-center text-muted mb-4" data-key="login_instruction">Ingresa tus credenciales para acceder a tu portal.</p>
+
+                    <div class="d-grid gap-2 mb-4">
+                        <a href="#" class="btn btn-light border btn-lg"><i class="bi bi-google me-2"></i> <span data-key="login_google">Continuar con Google</span></a>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-4">
+                        <hr class="flex-grow-1">
+                        <span class="mx-3 text-muted" data-key="login_or">O</span>
+                        <hr class="flex-grow-1">
+                    </div>
+
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label for="emailInput" class="form-label" data-key="login_email_label">Correo Electrónico</label>
+                            <input type="email" class="form-control form-control-lg" id="emailInput" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="passwordInput" class="form-label" data-key="login_password_label">Contraseña</label>
+                            <input type="password" class="form-control form-control-lg" id="passwordInput" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" data-key="login_button">Ingresar</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <a href="#" class="text-decoration-none"><small data-key="login_forgot_password">¿Olvidaste tu contraseña?</small></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="languages.js"></script>
+    <script>
+        // --- SISTEMA DE TRADUCCIÓN AUTOMÁTICA ---
+        (function() {
+            const elementsToTranslate = document.querySelectorAll('[data-key]');
+            
+            function setLanguage(lang) {
+                // Verificar que las traducciones estén disponibles
+                if (!window.translations || !window.translations[lang]) {
+                    console.error('Translations not available for language:', lang);
+                    return;
+                }
+
+                console.log('Setting language to:', lang);
+
+                // Actualizar el idioma del documento
+                document.documentElement.lang = lang;
+                
+                // Traducir todos los elementos con data-key
+                elementsToTranslate.forEach(element => {
+                    const key = element.dataset.key;
+                    const translation = window.translations[lang][key];
+                    
+                    if (translation === undefined) {
+                        console.warn('Translation missing for key:', key, 'in language:', lang);
+                        return;
+                    }
+
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = translation;
+                    } else {
+                        const icon = element.querySelector('i.bi');
+                        if (icon) {
+                            element.innerHTML = '';
+                            element.appendChild(icon);
+                            element.innerHTML += ' ' + translation;
+                        } else {
+                            element.innerHTML = translation;
+                        }
+                    }
+                });
+
+                console.log('Language changed successfully to:', lang);
+            }
+
+            // Función para inicializar el idioma cuando las traducciones estén listas
+            function initializeLanguage() {
+                console.log('=== INITIALIZING LANGUAGE SYSTEM ===');
+                console.log('window.translations exists:', !!window.translations);
+                
+                // Verificar que las traducciones estén disponibles
+                if (window.translations) {
+                    const initialLang = localStorage.getItem('language') || 'es';
+                    console.log('Translations are ready. Setting initial language:', initialLang);
+                    setLanguage(initialLang);
+                    document.documentElement.style.visibility = 'visible';
+                    console.log('Language system initialized successfully');
+                } else {
+                    // Si las traducciones no están listas, esperar un poco más
+                    console.log('Waiting for translations to load...');
+                    setTimeout(initializeLanguage, 100);
+                }
+            }
+
+            // Inicializar idioma cuando las traducciones estén disponibles
+            initializeLanguage();
+            
+            // Event listener adicional para cuando se carga languages.js
+            window.addEventListener('load', function() {
+                console.log('=== WINDOW LOAD EVENT ===');
+                console.log('window.translations after load:', window.translations);
+                if (window.translations) {
+                    console.log('Available languages after load:', Object.keys(window.translations));
+                }
+            });
+            
+            // Verificar si languages.js ya está cargado
+            if (window.translations) {
+                console.log('=== LANGUAGES.JS ALREADY LOADED ===');
+                console.log('Available languages:', Object.keys(window.translations));
+            } else {
+                console.log('=== LANGUAGES.JS NOT YET LOADED ===');
+            }
+        })();
+
+        // --- LÓGICA DEL FORMULARIO DE LOGIN ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const email = document.getElementById('emailInput').value;
+                    const password = document.getElementById('passwordInput').value;
+                    if (email === 'cliente@mail.com' && password === '123456') {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        // Mensaje de error traducido según el idioma actual
+                        const currentLang = localStorage.getItem('language') || 'es';
+                        let errorTitle, errorText;
+                        
+                        if (currentLang === 'en') {
+                            errorTitle = 'Access Error';
+                            errorText = 'Incorrect username or password.';
+                        } else if (currentLang === 'pt') {
+                            errorTitle = 'Erro de Acesso';
+                            errorText = 'Nome de usuário ou senha incorretos.';
+                        } else {
+                            errorTitle = 'Error de Acceso';
+                            errorText = 'Usuario o contraseña incorrectos.';
+                        }
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: errorTitle,
+                            text: errorText,
+                            confirmButtonColor: '#0d6efd'
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

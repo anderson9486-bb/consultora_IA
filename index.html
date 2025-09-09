@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-key="page_title">Consultora de Inteligencia Artificial</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+    
+    <!-- Preload de imágenes críticas -->
+    <link rel="preload" href="images/about.jpg" as="image" fetchpriority="high">
+    <link rel="preload" href="images/hero.jpg" as="image" fetchpriority="high">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Script crítico simplificado -->
+    <script>
+        (function() {
+            const savedLang = localStorage.getItem('language') || 'es';
+            document.documentElement.lang = savedLang;
+            
+            // Ocultar página hasta que esté lista
+            document.documentElement.style.visibility = 'hidden';
+            
+            // Función global para mostrar la página
+            window.showPage = function() {
+                document.documentElement.style.visibility = 'visible';
+            };
+            
+            // Función global para obtener idioma actual
+            window.getCurrentLanguage = function() {
+                return savedLang;
+            };
+            
+            console.log('Language initialized:', savedLang);
+        })();
+    </script>
+    
+
+</head>
+<body>
+
+
+
+    <!--Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" data-key="brand_name">IA Consultores</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#inicio" data-key="nav_home">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#servicios" data-key="nav_services">Servicios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#nosotros" data-key="nav_about">Nosotros</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contacto" data-key="nav_contact">Contacto</a>
+                    </li>
+                </ul>
+                <a href="login.html" class="btn btn-outline-primary ms-lg-3" data-key="nav_login">
+                            Iniciar Sesión
+                    </a>
+                <div class="dropdown ms-3" id="langDropdownContainer">
+                    <button class="btn btn-light border fw-semibold d-flex align-items-center gap-2" id="langDropdownBtn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img id="langDropdownFlag" src="" width="24" alt="" class="rounded-circle border">
+                        <span id="langDropdownText" data-key="lang_button"></span>
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="langDropdownBtn" id="langDropdownMenu" style="min-width: 180px;">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-lang="es" data-flag="https://flagcdn.com/es.svg" id="lang-es">
+                                <img src="https://flagcdn.com/es.svg" width="24" alt="Español" class="rounded-circle border">
+                                <span>Español</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-lang="en" data-flag="https://flagcdn.com/us.svg" id="lang-en">
+                                <img src="https://flagcdn.com/us.svg" width="24" alt="English" class="rounded-circle border">
+                                <span>English</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" href="#" data-lang="pt" data-flag="https://flagcdn.com/br.svg" id="lang-pt">
+                                <img src="https://flagcdn.com/br.svg" width="24" alt="Português" class="rounded-circle border">
+                                <span>Português</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="inicio" class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold" data-key="hero_title">Adelanta tu Empresa al Futuro</h1>
+            <p class="lead my-4" data-key="hero_subtitle">Integramos la próxima generación de inteligencia artificial en tu flujo de trabajo para darte una ventaja competitiva decisiva.</p>
+            <a href="#contacto" class="btn btn-primary btn-lg" data-key="hero_button">Solicita una Consulta</a>
+        </div>
+    </header>
+
+    <!-- Services Section -->
+    <section id="servicios" class="py-5">
+        <div class="container">
+            <h2 class="section-title" data-key="services_title">Nuestros Servicios</h2>
+            <div class="row text-center">
+                <div class="col-md-4 mb-4" data-aos="fade-up">
+                    <div class="card service-card p-4 h-100">
+                        <i class="bi bi-rocket-takeoff service-icon mb-3"></i>
+                        <h4 class="fw-bold" data-key="service1_title">Prototipado Rápido con IA</h4>
+                        <p data-key="service1_text">Validamos tus ideas de negocio en días, no meses, creando prototipos funcionales con herramientas de IA de vanguardia.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card service-card p-4 h-100">
+                        <i class="bi bi-gear service-icon mb-3"></i>
+                        <h4 class="fw-bold" data-key="service2_title">Automatización de Procesos</h4>
+                        <p data-key="service2_text">Identificamos cuellos de botella en tu flujo de trabajo y desplegamos soluciones de IA para automatizar tareas repetitivas.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card service-card p-4 h-100">
+                        <i class="bi bi-briefcase service-icon mb-3"></i>
+                        <h4 class="fw-bold" data-key="service3_title">Consultoría Estratégica</h4>
+                        <p data-key="service3_text">Te guiamos en la creación de una hoja de ruta de IA, asegurando que cada inversión tecnológica impulse tus objetivos de negocio.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="nosotros" class="py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2 class="section-title text-start" data-key="about_title">Sobre Nosotros</h2>
+                    <p data-key="about_text1">Somos un equipo de expertos apasionados por la inteligencia artificial y su potencial para resolver problemas complejos. Nuestra misión es ayudar a las empresas a navegar por el paisaje de la IA, identificando oportunidades y desarrollando soluciones innovadoras que generen un impacto real.</p>
+                    <p data-key="about_text2">Con años de experiencia en la industria, combinamos conocimiento técnico profundo con una comprensión estratégica del negocio para entregar resultados excepcionales.</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="about-image-container shadow">
+                        <img src="images/about.jpg" 
+                             class="about-image img-fluid rounded" 
+                             alt="Nuestro equipo" 
+                             id="aboutImage"
+                             loading="eager"
+                             decoding="sync">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section id="cta" class="py-5 bg-light text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <h2 class="display-5 fw-bold" data-key="cta_title">¿Listo para transformar tu negocio?</h2>
+                    <p class="lead mt-3" data-key="cta_subtitle">Da el siguiente paso hacia la innovación y la eficiencia.</p>
+                    <button class="btn btn-primary btn-lg mt-4" data-bs-toggle="modal" data-bs-target="#contactModal" data-key="cta_button">Contacta con un experto</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer / Contact Section -->
+    <footer id="contacto" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="display-4 fw-bold mb-4 text-white" data-key="contact_title">Contáctanos</h2>
+                    <p class="lead mb-5 text-white" data-key="contact_subtitle">Estamos listos para ayudarte. Contáctanos para una consulta gratuita.</p>
+                </div>
+            </div>
+            <hr class="my-5">
+            <div class="text-center">
+                <div class="social-links">
+                    <a href="https://twitter.com/tu_usuario" class="text-decoration-none me-3"><i class="bi bi-twitter h4"></i></a>
+                    <a href="https://facebook.com/tu_usuario" class="text-decoration-none me-3"><i class="bi bi-facebook h4"></i></a>
+                    <a href="https://instagram.com/tu_usuario" class="text-decoration-none me-3"><i class="bi bi-instagram h4"></i></a>
+                    <a href="https://linkedin.com/tu_usuario" class="text-decoration-none"><i class="bi bi-linkedin h4"></i></a>
+                </div>
+                <p class="mb-0 mt-4" data-key="footer_copyright">&copy; 2025 IA Consultores. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+<!-- Modal de Contacto MEJORADO -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-white border-0">
+                <div class="d-flex align-items-center w-100">
+                    <i class="bi bi-envelope-paper-fill text-primary me-2" style="font-size:1.8rem;"></i>
+                    <h5 class="modal-title fw-semibold text-dark" id="contactModalLabel" data-key="modal_title">Formulario de Contacto</h5>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+            </div>
+            <div class="modal-body bg-white px-4 py-4">
+                <!-- FORMULARIO MEJORADO con validación condicional -->
+                <form id="contact-form" action="https://formspree.io/f/xblkenwr" method="POST" novalidate>
+                    <!-- Mensaje informativo -->
+                    <div class="alert alert-info mb-4" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <span data-key="modal_info_note">Nota: Los campos marcados con * son obligatorios. El correo electrónico es requerido para envío por email, y el número de celular para envío por WhatsApp.</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label visually-hidden">Nombre *</label>
+                        <input type="text" class="form-control form-control-lg border rounded-3" id="name" name="name" placeholder="Tu Nombre *" required data-key="modal_name_placeholder">
+                        <div class="invalid-feedback" data-key="validation_required">Este campo es obligatorio.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label visually-hidden">Correo Electrónico</label>
+                        <!-- CAMPO DE CORREO MEJORADO: tipo "email" -->
+                        <input type="email" class="form-control form-control-lg border rounded-3" id="email" name="email" placeholder="Tu Correo Electrónico" data-key="modal_email_placeholder">
+                        <div class="invalid-feedback" data-key="validation_email_invalid">Por favor, introduce un correo válido.</div>
+                    </div>
+                    <!-- NUEVO CAMPO: Número de Celular -->
+                    <div class="mb-3">
+                        <label for="phone" class="form-label visually-hidden">Número de Celular</label>
+                        <input type="tel" class="form-control form-control-lg border rounded-3" id="phone" name="phone" placeholder="Número de Celular" data-key="modal_phone_placeholder">
+                        <div class="invalid-feedback" data-key="validation_required">Este campo es obligatorio.</div>
+                    </div>
+                    
+                    <!-- NUEVO CAMPO: Servicio de Interés -->
+                    <div class="mb-3">
+                        <label for="service" class="form-label visually-hidden">Servicio de Interés *</label>
+                        <select class="form-select form-select-lg border rounded-3" id="service" name="service" required>
+                            <option value="" selected disabled data-key="service_placeholder">Selecciona un servicio de interés</option>
+                            <option value="prototipado" data-key="service_prototyping">Prototipado Rápido con IA</option>
+                            <option value="automatizacion" data-key="service_automation">Automatización de Procesos</option>
+                            <option value="consultoria" data-key="service_consulting">Consultoría Estratégica</option>
+                            <option value="otro" data-key="service_other">Otro servicio</option>
+                        </select>
+                        <div class="invalid-feedback" data-key="validation_required">Por favor, selecciona un servicio.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="message" class="form-label visually-hidden">Mensaje *</label>
+                        <textarea class="form-control form-control-lg border rounded-3" id="message" name="message" rows="4" placeholder="Mensaje *" required data-key="modal_message_placeholder"></textarea>
+                        <div class="invalid-feedback" data-key="validation_required">Este campo es obligatorio.</div>
+                    </div>
+                    <div class="d-flex justify-content-center gap-3">
+                        <button type="submit" id="submit-email" class="btn btn-email btn-lg px-4 rounded-3 shadow-sm">
+                            <i class="bi bi-envelope-fill me-1"></i> <span data-key="modal_submit_email_button">Enviar por Correo</span>
+                        </button>
+                        <button type="button" id="submit-whatsapp" class="btn btn-whatsapp btn-lg px-4 rounded-3 shadow-sm">
+                            <i class="bi bi-whatsapp me-1"></i> <span data-key="modal_submit_whatsapp_button">Enviar por WhatsApp</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="languages.js"></script>
+    <script>
+        // Script de verificación inmediata de languages.js
+        console.log('=== IMMEDIATE CHECK AFTER LANGUAGES.JS ===');
+        console.log('window.translations exists:', !!window.translations);
+        if (window.translations) {
+            console.log('Available languages:', Object.keys(window.translations));
+            console.log('Spanish translations:', window.translations.es ? 'Available' : 'Missing');
+            console.log('English translations:', window.translations.en ? 'Available' : 'Missing');
+            console.log('Portuguese translations:', window.translations.pt ? 'Available' : 'Missing');
+        } else {
+            console.error('ERROR: window.translations is not available!');
+        }
+    </script>
+    <!-- Script principal simplificado -->
+    <script>
+    (function() {
+        const langInfo = {
+            es: { flag: "https://flagcdn.com/es.svg", name: "Español" },
+            en: { flag: "https://flagcdn.com/us.svg", name: "English" },
+            pt: { flag: "https://flagcdn.com/br.svg", name: "Português" }
+        };
+
+        // Función para configurar el botón de idioma
+        function setupLanguageButton(lang) {
+            const langDropdownFlag = document.getElementById('langDropdownFlag');
+            const langDropdownText = document.getElementById('langDropdownText');
+            
+            if (langInfo[lang] && langDropdownFlag && langDropdownText) {
+                langDropdownFlag.src = langInfo[lang].flag;
+                langDropdownFlag.alt = langInfo[lang].name;
+                langDropdownText.textContent = langInfo[lang].name;
+            }
+        }
+
+        // Función para cambiar idioma
+        function setLanguage(lang) {
+            if (!window.translations || !window.translations[lang]) {
+                console.error('Translations not available for language:', lang);
+                return;
+            }
+
+            document.documentElement.lang = lang;
+            
+            // Traducir elementos
+            const elementsToTranslate = document.querySelectorAll('[data-key]');
+            elementsToTranslate.forEach(element => {
+                const key = element.dataset.key;
+                const translation = window.translations[lang][key];
+                
+                if (translation) {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = translation;
+                    } else if (element.tagName === 'OPTION') {
+                        element.textContent = translation;
+                    } else {
+                        const icon = element.querySelector('i.bi');
+                        if (icon) {
+                            element.innerHTML = '';
+                            element.appendChild(icon);
+                            element.innerHTML += ' ' + translation;
+                        } else {
+                            element.innerHTML = translation;
+                        }
+                    }
+                }
+            });
+
+            setupLanguageButton(lang);
+            localStorage.setItem('language', lang);
+            
+            // Mostrar página cuando esté lista
+            if (window.showPage) {
+                window.showPage();
+            }
+        }
+
+        // Inicializar cuando las traducciones estén listas
+        function initializeLanguage() {
+            if (window.translations && window.bootstrap) {
+                const initialLang = localStorage.getItem('language') || 'es';
+                setupLanguageButton(initialLang);
+                setLanguage(initialLang);
+            } else {
+                setTimeout(initializeLanguage, 100);
+            }
+        }
+
+        // Configurar eventos cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('language') || 'es';
+            setupLanguageButton(savedLang);
+            
+            // Event listener para cambio de idioma
+            const langDropdownMenu = document.getElementById('langDropdownMenu');
+            if (langDropdownMenu) {
+                langDropdownMenu.addEventListener('click', (e) => {
+                    const langItem = e.target.closest('[data-lang]');
+                    if (langItem) {
+                        e.preventDefault();
+                        setLanguage(langItem.dataset.lang);
+                    }
+                });
+            }
+            
+            // Inicializar idioma
+            initializeLanguage();
+        });
+    })();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Comportamiento de Scroll Suave ---
+        document.querySelectorAll('a[href^="#"]:not([data-bs-toggle="modal"])').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                // Skip if href is just "#" or empty
+                if (href === '#' || href === '') return;
+                
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // --- Resaltado del enlace activo según la sección visible ---
+        const sectionIds = ['inicio', 'servicios', 'nosotros', 'contacto'];
+        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+        function highlightNav() {
+            let scrollPos = window.scrollY + 100;
+            let currentSection = sectionIds[0];
+
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
+                currentSection = sectionIds[sectionIds.length - 1];
+            } else {
+                sectionIds.forEach(id => {
+                    const section = document.getElementById(id);
+                    if (section && section.offsetTop <= scrollPos) {
+                        currentSection = id;
+                    }
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.classList.remove('active-section');
+                if (link.getAttribute('href') === '#' + currentSection) {
+                    link.classList.add('active-section');
+                }
+            });
+        }
+        window.addEventListener('scroll', highlightNav);
+        highlightNav();
+
+        // --- SISTEMA MEJORADO DE FORMULARIO DE CONTACTO ---
+        const contactForm = document.getElementById('contact-form');
+        const whatsappSubmitButton = document.getElementById('submit-whatsapp');
+        const emailSubmitButton = document.getElementById('submit-email');
+
+        // Estados del formulario
+        let isSubmitting = false;
+
+        // Función para mostrar notificaciones
+        function showNotification(message, type = 'success') {
+            // Crear notificación
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Función para validar campo individual
+        const validateField = (field) => {
+            field.classList.remove('is-invalid');
+            field.classList.remove('is-valid');
+            
+            let isValid = true;
+            let errorMessage = '';
+
+            // Validar campo requerido
+            if (field.required && field.value.trim() === '') {
+                isValid = false;
+                errorMessage = 'Este campo es obligatorio.';
+            }
+            
+            // Validar email
+            if (field.type === 'email' && field.value.trim() !== '') {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(field.value)) {
+                    isValid = false;
+                    errorMessage = 'Por favor, introduce un correo válido.';
+                }
+            }
+            
+            // Validar teléfono
+            if (field.type === 'tel' && field.value.trim() !== '') {
+                const phoneRegex = /^[\+]?[0-9\s\-\(\)]{7,}$/;
+                if (!phoneRegex.test(field.value.replace(/\s/g, ''))) {
+                    isValid = false;
+                    errorMessage = 'Por favor, introduce un número de teléfono válido.';
+                }
+            }
+
+            if (!isValid) {
+                field.classList.add('is-invalid');
+                const feedbackElement = field.nextElementSibling;
+                if (feedbackElement && feedbackElement.classList.contains('invalid-feedback')) {
+                    feedbackElement.textContent = errorMessage;
+                }
+            } else {
+                field.classList.add('is-valid');
+            }
+            
+            return isValid;
+        };
+
+        // Función para validar formulario según método de envío
+        const validateForm = (method) => {
+            let isFormValid = true;
+            
+            // Campos siempre obligatorios
+            const alwaysRequired = ['name', 'message', 'service'];
+            alwaysRequired.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (field && !validateField(field)) {
+                    isFormValid = false;
+                }
+            });
+            
+            // Validación condicional según método
+            if (method === 'email') {
+                // Para email, validar campo de correo
+                const emailField = document.getElementById('email');
+                if (emailField && !validateField(emailField)) {
+                    isFormValid = false;
+                }
+            } else if (method === 'whatsapp') {
+                // Para WhatsApp, validar campo de teléfono
+                const phoneField = document.getElementById('phone');
+                if (phoneField && !validateField(phoneField)) {
+                    isFormValid = false;
+                }
+            }
+            
+            return isFormValid;
+        };
+
+        // Función para limpiar el formulario
+        const resetForm = () => {
+            contactForm.reset();
+            contactForm.querySelectorAll('.form-control, .form-select').forEach(field => {
+                field.classList.remove('is-valid', 'is-invalid');
+            });
+        };
+
+        // Función para cambiar estado de botones
+        const setFormState = (submitting) => {
+            isSubmitting = submitting;
+            emailSubmitButton.disabled = submitting;
+            whatsappSubmitButton.disabled = submitting;
+            
+            if (submitting) {
+                emailSubmitButton.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Enviando...';
+                whatsappSubmitButton.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Procesando...';
+            } else {
+                emailSubmitButton.innerHTML = '<i class="bi bi-envelope-fill me-1"></i> <span data-key="modal_submit_email_button">Enviar por Correo</span>';
+                whatsappSubmitButton.innerHTML = '<i class="bi bi-whatsapp me-1"></i> <span data-key="modal_submit_whatsapp_button">Enviar por WhatsApp</span>';
+            }
+        };
+
+        // Función para enviar por email usando Formspree
+        const submitToEmail = async (formData) => {
+            try {
+                setFormState(true);
+                
+                const response = await fetch('https://formspree.io/f/xblkenwr', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    showNotification('¡Mensaje enviado exitosamente! Te responderemos pronto.', 'success');
+                    resetForm();
+                    
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('contactModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                } else {
+                    throw new Error('Error en el servidor');
+                }
+            } catch (error) {
+                console.error('Error sending email:', error);
+                showNotification('Error al enviar el mensaje. Por favor, intenta nuevamente.', 'danger');
+            } finally {
+                setFormState(false);
+            }
+        };
+
+        // Función para enviar por WhatsApp
+        const submitToWhatsApp = () => {
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const message = document.getElementById('message').value.trim();
+            const service = document.getElementById('service').value;
+            
+            if (!name || !phone || !message || !service) {
+                showNotification('Por favor, completa todos los campos antes de enviar por WhatsApp.', 'warning');
+                return;
+            }
+            
+            const phoneNumber = "573135348380"; // Tu número de WhatsApp
+            
+            // Obtener el texto traducido del servicio seleccionado
+            const serviceElement = document.querySelector(`option[value="${service}"]`);
+            const serviceName = serviceElement ? serviceElement.textContent : service;
+            
+            const whatsappMessage = `¡Hola! 👋 Te contacto desde la web de IA Consultores.\n\n*Nombre:* ${name}\n*Celular:* ${phone}\n*Email:* ${document.getElementById('email').value.trim()}\n*Servicio de interés:* ${serviceName}\n\n*Mensaje:* ${message}\n\n*Consulta desde:* Formulario web`;
+            
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+            window.open(whatsappUrl, '_blank');
+            
+            showNotification('Redirigiendo a WhatsApp...', 'info');
+            resetForm();
+            
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('contactModal'));
+            if (modal) {
+                modal.hide();
+            }
+        };
+
+        // Función principal para manejar envío del formulario
+        const handleFormSubmission = async (event) => {
+            event.preventDefault();
+            
+            if (isSubmitting) {
+                return; // Evitar envíos múltiples
+            }
+
+            const clickedButtonId = event.submitter ? event.submitter.id : 'submit-email';
+            
+            if (clickedButtonId === 'submit-email') {
+                // Validar para envío por email
+                if (!validateForm('email')) {
+                    showNotification('Por favor, corrige los errores en el formulario.', 'warning');
+                    return;
+                }
+                
+                // Enviar por email
+                const formData = new FormData(contactForm);
+                await submitToEmail(formData);
+            } else if (clickedButtonId === 'submit-whatsapp') {
+                // Validar para envío por WhatsApp
+                if (!validateForm('whatsapp')) {
+                    showNotification('Por favor, corrige los errores en el formulario.', 'warning');
+                    return;
+                }
+                
+                // Enviar por WhatsApp
+                submitToWhatsApp();
+            }
+        };
+
+        // Event listeners
+        contactForm.addEventListener('submit', handleFormSubmission);
+        
+        // Validación en tiempo real
+        contactForm.querySelectorAll('.form-control, .form-select').forEach(field => {
+            field.addEventListener('blur', () => validateField(field));
+            field.addEventListener('input', () => {
+                if (field.classList.contains('is-invalid')) {
+                    validateField(field);
+                }
+            });
+        });
+        
+        // Botón de WhatsApp
+        whatsappSubmitButton.addEventListener('click', (event) => {
+            const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+            submitEvent.submitter = whatsappSubmitButton;
+            contactForm.dispatchEvent(submitEvent);
+        });
+
+        // Limpiar formulario cuando se cierre el modal
+        document.getElementById('contactModal').addEventListener('hidden.bs.modal', function () {
+            resetForm();
+        });
+
+        // Initializing AOS
+        AOS.init();
+    });
+    </script>
+</body>
+</html>
