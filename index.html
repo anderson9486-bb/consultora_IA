@@ -118,10 +118,10 @@
             <h2 class="section-title" data-key="services_title">Nuestros Servicios</h2>
             <div class="row text-center">
                 <div class="col-md-4 mb-4" data-aos="fade-up">
-                    <div class="card service-card p-4 h-100">
-                        <i class="bi bi-rocket-takeoff service-icon mb-3"></i>
-                        <h4 class="fw-bold" data-key="service1_title">Prototipado Rápido con IA</h4>
-                        <p data-key="service1_text">Validamos tus ideas de negocio en días, no meses, creando prototipos funcionales con herramientas de IA de vanguardia.</p>
+                    <div class="card service-card service-card-clickable p-4 h-100" data-bs-toggle="modal" data-bs-target="#generativeModal">
+                        <i class="bi bi-magic service-icon mb-3"></i>
+                        <h4 class="fw-bold" data-key="service1_title_new">Genera tu Diseño con IA</h4>
+                        <p data-key="service1_text_new">Describe tu negocio y nuestra IA generará tres propuestas visuales para tu sitio web en segundos. ¡Haz clic y pruébalo ahora!</p>
                     </div>
                 </div>
                 <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
@@ -199,6 +199,48 @@
             </div>
         </div>
     </footer>
+
+<!-- Modal de Generación IA -->
+<div class="modal fade" id="generativeModal" tabindex="-1" aria-labelledby="generativeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-white border-0">
+                <div class="d-flex align-items-center w-100">
+                    <i class="bi bi-magic text-primary me-2" style="font-size:1.8rem;"></i>
+                    <h5 class="modal-title fw-semibold text-dark" id="generativeModalLabel" data-key="generative_modal_title">Genera tu Diseño con IA</h5>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+            </div>
+            <div class="modal-body bg-white px-4 py-4">
+                <div class="row">
+                    <div class="col-12">
+                        <p class="text-muted" data-key="generative_modal_instruction">Describe tu empresa, producto o idea. Incluye detalles como el estilo que te gusta (moderno, minimalista, etc.), colores y el público al que te diriges. Mientras más detalles, mejores serán los resultados.</p>
+                        <textarea class="form-control form-control-lg border rounded-3 mb-3" id="businessDescription" rows="5" placeholder="Ej: Una cafetería de especialidad en el centro de la ciudad, con un ambiente rústico y acogedor. Busco un diseño web limpio, con colores tierra y fotos grandes de nuestros productos..." data-key="generative_modal_placeholder"></textarea>
+                        
+                        <div id="image-results-container" class="mt-4 d-none">
+                            <h6 class="fw-bold text-center mb-3" data-key="generative_modal_results_title">Aquí tienes algunas ideas:</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4"><div class="result-image-placeholder"></div></div>
+                                <div class="col-md-4"><div class="result-image-placeholder"></div></div>
+                                <div class="col-md-4"><div class="result-image-placeholder"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="button" id="generate-design-button" class="btn btn-primary btn-lg px-4 rounded-3 shadow-sm">
+                                <span class="generate-text" data-key="generative_modal_button">Generar Diseños</span>
+                                <span class="generating-text d-none">
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span data-key="generative_modal_button_generating">Haciendo magia...</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal de Contacto MEJORADO -->
 <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
@@ -679,6 +721,81 @@
 
         // Initializing AOS
         AOS.init();
+
+        // --- LÓGICA DEL MODAL GENERATIVO ---
+        const generativeModal = document.getElementById('generativeModal');
+        const generateBtn = document.getElementById('generate-design-button');
+        const resultsContainer = document.getElementById('image-results-container');
+        const descriptionInput = document.getElementById('businessDescription');
+        const generateText = generateBtn.querySelector('.generate-text');
+        const generatingText = generateBtn.querySelector('.generating-text');
+
+        generateBtn.addEventListener('click', async function() {
+            const description = descriptionInput.value;
+            if (!description.trim()) {
+                showNotification('Por favor, describe tu negocio para generar los diseños.', 'warning');
+                return;
+            }
+
+            // 1. Cambiar al estado de "cargando"
+            generateBtn.disabled = true;
+            generateText.classList.add('d-none');
+            generatingText.classList.remove('d-none');
+            resultsContainer.classList.add('d-none');
+
+            try {
+                // 2. Llamar a nuestra función de back-end
+                const response = await fetch('/api/generate-images', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ description: description }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('La respuesta del servidor no fue exitosa.');
+                }
+
+                const data = await response.json();
+
+                // 3. Mostrar los resultados
+                const placeholderDivs = resultsContainer.querySelectorAll('.result-image-placeholder');
+                placeholderDivs.forEach((div, index) => {
+                    div.innerHTML = ''; // Limpiar placeholder
+                    if (data.images[index]) {
+                        const img = document.createElement('img');
+                        // Asumimos que la respuesta de la API es una URL de imagen válida
+                        // Si Gemini devuelve Base64, necesitaríamos ajustar aquí
+                        img.src = data.images[index]; 
+                        img.alt = `Diseño generado ${index + 1}`;
+                        img.className = 'img-fluid rounded shadow-sm';
+                        div.appendChild(img);
+                    }
+                });
+                resultsContainer.classList.remove('d-none');
+                showNotification('¡Se han generado tus diseños!', 'success');
+
+            } catch (error) {
+                console.error('Error al llamar a la función serverless:', error);
+                showNotification('Hubo un error al generar los diseños. Inténtalo de nuevo.', 'danger');
+            } finally {
+                // 4. Volver al estado normal del botón
+                generateBtn.disabled = false;
+                generateText.classList.remove('d-none');
+                generatingText.classList.add('d-none');
+            }
+        });
+
+        // Limpiar el modal cuando se cierra
+        generativeModal.addEventListener('hidden.bs.modal', function () {
+            descriptionInput.value = '';
+            resultsContainer.classList.add('d-none');
+            const placeholderDivs = resultsContainer.querySelectorAll('.result-image-placeholder');
+            placeholderDivs.forEach(div => {
+                div.innerHTML = ''; // Limpiar imágenes
+            });
+        });
     });
     </script>
 </body>
