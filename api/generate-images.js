@@ -1,11 +1,10 @@
-// Usamos la sintaxis de importación de ES Modules, más moderna y robusta.
-import { GoogleGenerativeAI } from '@google/generative-ai';
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Obtenemos la clave de API de las variables de entorno del servidor
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// La función principal ahora se exporta como 'default'
-export default async function handler(event, context) {
+// Esta es la función principal que se ejecutará cuando el front-end la llame
+exports.handler = async function(event, context) {
     // Solo permitir peticiones POST
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
