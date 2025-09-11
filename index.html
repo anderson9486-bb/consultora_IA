@@ -217,24 +217,32 @@
                         <p class="text-muted" data-key="generative_modal_instruction">Describe tu empresa, producto o idea. Incluye detalles como el estilo que te gusta (moderno, minimalista, etc.), colores y el público al que te diriges. Mientras más detalles, mejores serán los resultados.</p>
                         <textarea class="form-control form-control-lg border rounded-3 mb-3" id="businessDescription" rows="5" placeholder="Ej: Una cafetería de especialidad en el centro de la ciudad, con un ambiente rústico y acogedor. Busco un diseño web limpio, con colores tierra y fotos grandes de nuestros productos..." data-key="generative_modal_placeholder"></textarea>
                         
-                        <div id="image-results-container" class="mt-4 d-none">
-                            <h6 class="fw-bold text-center mb-3" data-key="generative_modal_results_title">Aquí tienes algunas ideas:</h6>
-                            <div class="row g-3">
-                                <div class="col-md-4"><div class="result-image-placeholder"></div></div>
-                                <div class="col-md-4"><div class="result-image-placeholder"></div></div>
-                                <div class="col-md-4"><div class="result-image-placeholder"></div></div>
+                        <div class="d-grid mb-4">
+                            <button type="button" id="generate-design-button" class="btn btn-primary btn-lg px-4 rounded-3 shadow-sm">
+                                <span class="generate-text" data-key="generative_modal_button">Generar Diseños</span>
+                            </button>
+                        </div>
+
+                        <!-- Contenedor de Resultados con Pestañas -->
+                        <div id="results-container" class="mt-4" style="display: none;">
+                            <!-- Spinner de Carga -->
+                            <div id="loading-spinner" class="text-center p-5" style="display: none;">
+                                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 fw-bold" data-key="generative_modal_button_generating">Haciendo magia...</p>
+                            </div>
+                            <!-- Pestañas y Contenido -->
+                            <div id="designs-output" style="display: none;">
+                                <ul class="nav nav-tabs nav-fill mb-3" id="designs-tab" role="tablist">
+                                    <!-- Las pestañas se insertarán aquí -->
+                                </ul>
+                                <div class="tab-content" id="designs-tab-content">
+                                    <!-- El contenido de las pestañas (iframes) se insertará aquí -->
+                                </div>
                             </div>
                         </div>
 
-                        <div class="d-grid mt-4">
-                            <button type="button" id="generate-design-button" class="btn btn-primary btn-lg px-4 rounded-3 shadow-sm">
-                                <span class="generate-text" data-key="generative_modal_button">Generar Diseños</span>
-                                <span class="generating-text d-none">
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    <span data-key="generative_modal_button_generating">Haciendo magia...</span>
-                                </span>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -328,8 +336,16 @@
             console.error('ERROR: window.translations is not available!');
         }
     </script>
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
     <!-- Script principal simplificado -->
-    <script>
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
     (function() {
         const langInfo = {
             es: { flag: "https://flagcdn.com/es.svg", name: "Español" },
@@ -513,7 +529,7 @@
             
             // Validar email
             if (field.type === 'email' && field.value.trim() !== '') {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const emailRegex = /^[^\]@]+@[^\]@]+\.[^\]@]+$/;
                 if (!emailRegex.test(field.value)) {
                     isValid = false;
                     errorMessage = 'Por favor, introduce un correo válido.';
@@ -522,7 +538,7 @@
             
             // Validar teléfono
             if (field.type === 'tel' && field.value.trim() !== '') {
-                const phoneRegex = /^[\+]?[0-9\s\-\(\)]{7,}$/;
+                const phoneRegex = /^[^\]@]+@[^\]@]+\.[^\]@]+$/;
                 if (!phoneRegex.test(field.value.replace(/\s/g, ''))) {
                     isValid = false;
                     errorMessage = 'Por favor, introduce un número de teléfono válido.';
@@ -647,7 +663,8 @@
             const serviceElement = document.querySelector(`option[value="${service}"]`);
             const serviceName = serviceElement ? serviceElement.textContent : service;
             
-            const whatsappMessage = `¡Hola! 👋 Te contacto desde la web de IA Consultores.\n\n*Nombre:* ${name}\n*Celular:* ${phone}\n*Email:* ${document.getElementById('email').value.trim()}\n*Servicio de interés:* ${serviceName}\n\n*Mensaje:* ${message}\n\n*Consulta desde:* Formulario web`;
+            const whatsappMessage = `¡Hola! 👋 Te contacto desde la web de IA Consultores.\n\n*Nombre:* ${name}\n*Celular:* ${phone}\n*Email:* ${document.getElementById('email').value.trim()}
+*Servicio de interés:* ${serviceName}\n\n*Mensaje:* ${message}\n\n*Consulta desde:* Formulario web`;
             
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
             window.open(whatsappUrl, '_blank');
@@ -725,10 +742,12 @@
         // --- LÓGICA DEL MODAL GENERATIVO ---
         const generativeModal = document.getElementById('generativeModal');
         const generateBtn = document.getElementById('generate-design-button');
-        const resultsContainer = document.getElementById('image-results-container');
+        const resultsContainer = document.getElementById('results-container');
         const descriptionInput = document.getElementById('businessDescription');
-        const generateText = generateBtn.querySelector('.generate-text');
-        const generatingText = generateBtn.querySelector('.generating-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const designsOutput = document.getElementById('designs-output');
+        const designsTab = document.getElementById('designs-tab');
+        const designsTabContent = document.getElementById('designs-tab-content');
 
         generateBtn.addEventListener('click', async function() {
             const description = descriptionInput.value;
@@ -737,64 +756,82 @@
                 return;
             }
 
-            // 1. Cambiar al estado de "cargando"
-            generateBtn.disabled = true;
-            generateText.classList.add('d-none');
-            generatingText.classList.remove('d-none');
-            resultsContainer.classList.add('d-none');
+            // 1. Mostrar estado de carga y ocultar botón
+            generateBtn.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            loadingSpinner.style.display = 'block';
+            designsOutput.style.display = 'none';
 
             try {
-                // 2. Llamar a nuestra función de back-end
                 const response = await fetch('/api/generate-images', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ description: description }),
+                    body: JSON.stringify({ description }),
                 });
 
                 if (!response.ok) {
-                    throw new Error('La respuesta del servidor no fue exitosa.');
+                    throw new Error('Error en la respuesta del servidor');
                 }
 
-                const data = await response.json();
+                const { designs } = await response.json();
 
-                // 3. Mostrar los resultados
-                const placeholderDivs = resultsContainer.querySelectorAll('.result-image-placeholder');
-                placeholderDivs.forEach((div, index) => {
-                    div.innerHTML = ''; // Limpiar placeholder
-                    if (data.images[index]) {
-                        const img = document.createElement('img');
-                        // Asumimos que la respuesta de la API es una URL de imagen válida
-                        // Si Gemini devuelve Base64, necesitaríamos ajustar aquí
-                        img.src = data.images[index]; 
-                        img.alt = `Diseño generado ${index + 1}`;
-                        img.className = 'img-fluid rounded shadow-sm';
-                        div.appendChild(img);
-                    }
+                // 2. Limpiar resultados anteriores
+                designsTab.innerHTML = '';
+                designsTabContent.innerHTML = '';
+
+                // 3. Renderizar los nuevos diseños
+                designs.forEach((design, index) => {
+                    const designId = `design-${index + 1}`;
+                    const isActive = index === 0;
+                    
+                    // Crear pestaña
+                    const tab = document.createElement('li');
+                    tab.className = 'nav-item';
+                    tab.innerHTML = `
+                        <a class="nav-link ${isActive ? 'active' : ''}" id="${designId}-tab" data-bs-toggle="tab" href="#${designId}" role="tab" aria-controls="${designId}" aria-selected="${isActive}">Diseño ${index + 1}</a>
+                    `;
+                    designsTab.appendChild(tab);
+
+                    // Crear contenido de la pestaña con un iframe
+                    const tabPane = document.createElement('div');
+                    tabPane.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
+                    tabPane.id = designId;
+                    tabPane.setAttribute('role', 'tabpanel');
+                    tabPane.setAttribute('aria-labelledby', `${designId}-tab`);
+                    
+                    const iframe = document.createElement('iframe');
+                    iframe.style.width = '100%';
+                    iframe.style.height = '400px';
+                    iframe.style.border = '1px solid #dee2e6';
+                    iframe.srcdoc = design;
+
+                    tabPane.appendChild(iframe);
+                    designsTabContent.appendChild(tabPane);
                 });
-                resultsContainer.classList.remove('d-none');
-                showNotification('¡Se han generado tus diseños!', 'success');
+
+                // 4. Ocultar spinner y mostrar resultados
+                loadingSpinner.style.display = 'none';
+                designsOutput.style.display = 'block';
 
             } catch (error) {
-                console.error('Error al llamar a la función serverless:', error);
+                console.error('Error al generar los diseños:', error);
                 showNotification('Hubo un error al generar los diseños. Inténtalo de nuevo.', 'danger');
-            } finally {
-                // 4. Volver al estado normal del botón
-                generateBtn.disabled = false;
-                generateText.classList.remove('d-none');
-                generatingText.classList.add('d-none');
+                // Revertir la UI a su estado inicial en caso de error
+                generateBtn.style.display = 'block';
+                resultsContainer.style.display = 'none';
             }
         });
 
         // Limpiar el modal cuando se cierra
         generativeModal.addEventListener('hidden.bs.modal', function () {
             descriptionInput.value = '';
-            resultsContainer.classList.add('d-none');
-            const placeholderDivs = resultsContainer.querySelectorAll('.result-image-placeholder');
-            placeholderDivs.forEach(div => {
-                div.innerHTML = ''; // Limpiar imágenes
-            });
+            resultsContainer.style.display = 'none';
+            generateBtn.style.display = 'block'; // Restaurar el botón
+            designsTab.innerHTML = '';
+            designsTabContent.innerHTML = '';
+            designsOutput.style.display = 'none';
         });
     });
     </script>
