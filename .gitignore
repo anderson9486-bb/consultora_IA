@@ -1,1 +1,9 @@
-.vercel
+# Node.js dependencies
+node_modules/
+api/node_modules/
+
+# Mac OS files
+.DS_Store
+
+# Vercel specific files
+.vercel/

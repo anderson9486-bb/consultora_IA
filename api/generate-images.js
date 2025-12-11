@@ -1,83 +1,93 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// La clave de API se obtiene de las variables de entorno del servidor, nunca del frontend.
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// --- INGENIERÍA DE PROMPTS AVANZADA ---
-// Esta función crea un prompt detallado para generar una landing page completa en HTML y CSS.
-const createLandingPagePrompt = (description, style) => {
-    let styleInstructions = '';
-    switch (style) {
-        case 'Moderno':
-            styleInstructions = 'Usa un diseño limpio, con mucho espacio en blanco, una tipografía sans-serif moderna (como Inter o Manrope), y una paleta de colores primarios brillantes con un color de acento. Incluye una sección de héroe con un titular grande y un botón de llamada a la acción claro.';
-            break;
-        case 'Elegante':
-            styleInstructions = 'Usa un diseño sofisticado con una tipografía serif (como Playfair Display o Lora), colores oscuros o neutros (negro, gris, beige), e imágenes de alta calidad. El diseño debe ser simétrico y ordenado, transmitiendo lujo.';
-            break;
-        case 'Atrevido':
-            styleInstructions = 'Usa un diseño asimétrico, colores vibrantes o degradados, tipografías grandes y audaces (display fonts), y micro-interacciones o animaciones sutiles si es posible con CSS. Debe ser visualmente impactante y memorable.';
-            break;
-    }
-
-    return `
-        Tu tarea es actuar como un experto diseñador y desarrollador web frontend.
-        Genera el código HTML y CSS completo para una landing page de un solo archivo (inline CSS en etiquetas <style>) para el siguiente negocio: "${description}".
-        
-        REQUISITOS ESTRICTOS:
-        1.  **Estilo de Diseño**: ${styleInstructions}
-        2.  **Sin Archivos Externos**: No uses enlaces a archivos CSS o JS externos. Todo el CSS debe estar dentro de una etiqueta <style> en el <head>.
-        3.  **Imágenes**: Usa placeholders de https://placehold.co/ para las imágenes. No uses imágenes de otros sitios.
-        4.  **Contenido**: El texto debe estar en español y ser relevante para el negocio descrito.
-        5.  **Salida Limpia**: Responde ÚNICAMENTE con el código HTML. No incluyas explicaciones, comentarios, ni la palabra "HTML" o \
-```html\
-. La respuesta debe empezar directamente con "<!DOCTYPE html>".
-    `;
+/**
+ * Función de ayuda para limpiar el texto de respuesta de la IA, eliminando los bloques de código markdown.
+ * @param {string} rawText - El texto crudo devuelto por el modelo.
+ * @returns {string} El código HTML limpio.
+ */
+const cleanApiResponse = (rawText) => {
+  // Elimina ```html al principio y ``` al final, y recorta espacios en blanco.
+  return rawText.replace(/```html/g, "").replace(/```/g, "").trim();
 };
 
-// Exportación compatible con Vercel
-module.exports = async (req, res) => {
-    // Verificar que el método sea POST
-    if (req.method !== 'POST') {
-        res.setHeader('Allow', ['POST']);
-        return res.status(405).send('Method Not Allowed');
-    }
-
-    try {
-        // El cuerpo de la solicitud ya viene parseado por Vercel
-        const { description } = req.body;
-        if (!description) {
-            return res.status(400).json({ error: 'La descripción es obligatoria.' });
-        }
-
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-        // Crear tres prompts para tres estilos diferentes
-        const prompts = [
-            createLandingPagePrompt(description, 'Moderno'),
-            createLandingPagePrompt(description, 'Elegante'),
-            createLandingPagePrompt(description, 'Atrevido')
-        ];
-
-        // Ejecutar las tres generaciones en paralelo
-        const generationPromises = prompts.map(prompt => model.generateContent(prompt));
-        const results = await Promise.all(generationPromises);
-
-        // Extraer el código HTML de cada resultado
-        const designs = results.map(result => {
-            if (result.response && typeof result.response.text === 'function') {
-                return result.response.text();
-            }
-            return '<html><body><p>Error al generar este diseño. Por favor, intente de nuevo.</p></body></html>';
-        });
-
-        // Configurar cabeceras y enviar la respuesta exitosa
-        res.setHeader('Access-Control-Allow-Origin', '*'); // Considera restringir esto a tu dominio en producción
-        return res.status(200).json({ designs });
-
-    } catch (error) {
-        // Manejar cualquier error inesperado
-        console.error('Error en la función generate-images:', error);
-        return res.status(500).json({ error: 'Hubo un problema al generar los diseños.' });
-    }
+/**
+ * Función de ayuda para generar una versión de la página con un prompt específico.
+ * @param {GoogleGenerativeAI} genAI - La instancia del cliente de IA.
+ * @param {string} prompt - El prompt específico para la generación.
+ * @returns {Promise<string>} Una promesa que se resuelve con el código HTML generado y limpio.
+ */
+const generatePageVersion = async (genAI, prompt) => {
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  const rawHtml = response.text();
+  return cleanApiResponse(rawHtml);
 };
 
+/**
+ * Manejador de la API de Vercel para generar 3 versiones de una Landing Page.
+ */
+export default async function handler(req, res) {
+  // Configurar cabeceras CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', ['POST']);
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
+
+  try {
+    const { description } = req.body;
+    if (!description) {
+      return res.status(400).json({ error: 'La "description" es obligatoria en el cuerpo de la petición.' });
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("La variable de entorno GEMINI_API_KEY no está configurada.");
+    }
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+    // --- Prompts para cada estilo ---
+    const basePrompt = `Eres un experto diseñador y desarrollador web. Tu tarea es generar el código completo para una landing page en un único archivo HTML. El CSS debe estar integrado en la etiqueta <style> dentro del <head>. La página debe ser responsive. No incluyas explicaciones, comentarios, ni bloques de markdown, solo el código HTML puro.
+
+La descripción del negocio es: "${description}"
+
+`;
+
+    const prompts = [
+      {
+        style: "Minimalista",
+        prompt: basePrompt + "El estilo de diseño debe ser estrictamente MINIMALISTA. Usa mucho espacio en blanco, una paleta de colores muy limitada (blanco, negro, grises y un único color de acento), tipografía sans-serif limpia y una estructura muy sencilla y directa."
+      },
+      {
+        style: "Corporativo",
+        prompt: basePrompt + "El estilo de diseño debe ser PROFESIONAL y CORPORATIVO. Usa una estructura clara y ordenada, una paleta de colores seria (azules, grises, blancos), tipografía legible y un enfoque en la confianza y la profesionalidad. Incluye secciones como 'Servicios', 'Sobre Nosotros' y un 'Contacto' claro."
+      },
+      {
+        style: "Creativo",
+        prompt: basePrompt + "El estilo de diseño debe ser CREATIVO y MODERNO. Usa colores vibrantes, tipografías audaces, layouts asimétricos o no convencionales y elementos visuales llamativos. El objetivo es ser memorable y artístico, rompiendo con los esquemas tradicionales."
+      }
+    ];
+
+    // Ejecutar todas las generaciones en paralelo
+    const generationPromises = prompts.map(p => generatePageVersion(genAI, p.prompt));
+    
+    const generatedHtmls = await Promise.all(generationPromises);
+
+    // Devolver el JSON con los 3 resultados HTML
+    return res.status(200).json({ images: generatedHtmls });
+
+  } catch (error) {
+    console.error('Error al generar las páginas:', error);
+    return res.status(500).json({
+      error: 'Ocurrió un error en el servidor al generar las páginas.',
+      details: error.message
+    });
+  }
+}

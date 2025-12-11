@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,7 +8,7 @@
     <!-- Estilos y Fuentes -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -80,8 +79,8 @@
                 <div class="position-sticky pt-4">
                     <div class="text-center mb-4">
                         <img src="https://via.placeholder.com/100" alt="Foto de Perfil" class="rounded-circle img-fluid mb-2">
-                        <h5 class="fw-bold">Bienvenido, {{ user.name }}</h5>
-                        <p class="text-muted small">{{ user.role }}</p>
+                        <h5 class="fw-bold">Bienvenido, Cliente Ejemplo</h5>
+                        <p class="text-muted small">Cliente</p>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item"><a class="nav-link active" href="#" data-key="dash_summary"><i class="bi bi-house-door-fill me-2"></i> Resumen</a></li>
@@ -108,9 +107,9 @@
 
                 <!-- Tarjetas de Resumen -->
                 <div class="row">
-                    <div class="col-md-4"><div class="card text-white bg-primary mb-3"><div class="card-header fw-bold">Proyectos Activos</div><div class="card-body"><h2 class="card-title">{{ projects.active }}</h2><p class="card-text">Proyectos en desarrollo.</p></div></div></div>
-                    <div class="col-md-4"><div class="card text-white bg-success mb-3"><div class="card-header fw-bold">Tareas Completadas</div><div class="card-body"><h2 class="card-title">{{ tasks.completed }}</h2><p class="card-text">Tareas finalizadas este mes.</p></div></div></div>
-                    <div class="col-md-4"><div class="card text-white bg-warning mb-3"><div class="card-header fw-bold">Alertas Pendientes</div><div class="card-body"><h2 class="card-title">{{ alerts.pending }}</h2><p class="card-text">Notificaciones importantes.</p></div></div></div>
+                    <div class="col-md-4"><div class="card text-white bg-primary mb-3"><div class="card-header fw-bold">Proyectos Activos</div><div class="card-body"><h2 class="card-title">5</h2><p class="card-text">Proyectos en desarrollo.</p></div></div></div>
+                    <div class="col-md-4"><div class="card text-white bg-success mb-3"><div class="card-header fw-bold">Tareas Completadas</div><div class="card-body"><h2 class="card-title">24</h2><p class="card-text">Tareas finalizadas este mes.</p></div></div></div>
+                    <div class="col-md-4"><div class="card text-white bg-warning mb-3"><div class="card-header fw-bold">Alertas Pendientes</div><div class="card-body"><h2 class="card-title">3</h2><p class="card-text">Notificaciones importantes.</p></div></div></div>
                 </div>
 
                 <!-- Gráfico de Actividad -->
@@ -175,72 +174,7 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static 'languages.js' %}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Lógica de traducción
-            const langInfo = { es: { flag: "https://flagcdn.com/es.svg", name: "Español" }, en: { flag: "https://flagcdn.com/us.svg", name: "English" }, pt: { flag: "https://flagcdn.com/br.svg", name: "Português" } };
-            let currentLang = localStorage.getItem('language') || 'es';
-            function setLanguage(lang) {
-                document.documentElement.lang = lang;
-                document.querySelectorAll('[data-key]').forEach(el => { if (translations[lang]?.[el.dataset.key]) el.textContent = translations[lang][el.dataset.key]; });
-                if (langInfo[lang]) {
-                    document.getElementById('langDropdownFlag').src = langInfo[lang].flag;
-                    document.getElementById('langDropdownText').textContent = langInfo[lang].name;
-                }
-                localStorage.setItem('language', lang);
-            }
-            document.getElementById('langDropdownMenu').addEventListener('click', e => { const langItem = e.target.closest('[data-lang]'); if (langItem) { e.preventDefault(); setLanguage(langItem.dataset.lang); } });
-            setLanguage(currentLang);
-
-            // Gráfico mejorado
-            const ctx = document.getElementById('activityChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
-                    datasets: [
-                        {
-                            label: 'Tareas Completadas',
-                            data: [12, 19, 3, 5, 2, 3],
-                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                            borderColor: 'rgba(0, 123, 255, 1)',
-                            borderWidth: 2,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Proyectos Iniciados',
-                            data: [1, 2, 1, 3, 0, 1],
-                            backgroundColor: 'rgba(25, 135, 84, 0.1)',
-                            borderColor: 'rgba(25, 135, 84, 1)',
-                            borderWidth: 2,
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } },
-                    plugins: {
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    }
-                }
-            });
-
-            // Interacción del Sidebar
-            const sidebarLinks = document.querySelectorAll('#sidebar .nav-link');
-            sidebarLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    sidebarLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-        });
-    </script>
+    <script src="languages.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 </html>
