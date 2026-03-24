@@ -1,97 +1,115 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Anthropic from "@anthropic-ai/sdk";
 
-/**
- * Función de ayuda para limpiar el texto de respuesta de la IA, eliminando los bloques de código markdown.
- * @param {string} rawText - El texto crudo devuelto por el modelo.
- * @returns {string} El código HTML limpio.
- */
-const cleanApiResponse = (rawText) => {
-  // Elimina ```html al principio y ``` al final, y recorta espacios en blanco.
-  return rawText.replace(/```html/g, "").replace(/```/g, "").trim();
-};
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-/**
- * Función de ayuda para generar una versión de la página con un prompt específico.
- * @param {GoogleGenerativeAI} genAI - La instancia del cliente de IA.
- * @param {string} prompt - El prompt específico para la generación.
- * @returns {Promise<string>} Una promesa que se resuelve con el código HTML generado y limpio.
- */
-const generatePageVersion = async (genAI, prompt) => {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const rawHtml = response.text();
-  return cleanApiResponse(rawHtml);
-};
+const BASE_PROMPT = (description) => `Eres un experto diseñador y desarrollador web.
+Tu ÚNICA tarea es generar el código completo de una landing page en un único archivo HTML autocontenido.
 
-/**
- * Manejador de la API de Vercel para generar 3 versiones de una Landing Page.
- */
+REGLAS ESTRICTAS:
+- Responde ÚNICAMENTE con el código HTML. Sin explicaciones, sin markdown, sin bloques de código.
+- El CSS debe estar en una etiqueta <style> dentro del <head>.
+- El diseño debe ser responsive (mobile-first).
+- Usa solo colores, tipografías y layouts que reflejen el estilo solicitado.
+- Incluye secciones: Hero, Servicios/Características, Sobre nosotros y Contacto/CTA.
+- Usa fuentes de Google Fonts via CDN si el estilo lo requiere.
+
+Descripción del negocio: "${description}"
+`;
+
+const STYLES = [
+  {
+    name: "Minimalista",
+    instruction: `Estilo: MINIMALISTA.
+- Paleta: blanco, negro, grises y UN solo color de acento frío (ej: #3B82F6).
+- Tipografía sans-serif limpia (ej: Inter o DM Sans de Google Fonts).
+- Mucho espacio en blanco, márgenes generosos.
+- Sin sombras excesivas, sin gradientes llamativos.
+- Líneas finas como separadores, íconos simples (puedes usar caracteres Unicode o SVG inline simples).`,
+  },
+  {
+    name: "Corporativo",
+    instruction: `Estilo: PROFESIONAL Y CORPORATIVO.
+- Paleta: azul oscuro (#1E3A5F), gris (#4A5568), blanco y un acento dorado o azul cielo.
+- Tipografía robusta y legible (ej: Roboto o Source Sans 3 de Google Fonts).
+- Layout claro, grids ordenados, header con logo y navegación.
+- Sección de estadísticas o logros (badges con números grandes).
+- Footer completo con enlaces y datos de contacto.`,
+  },
+  {
+    name: "Creativo",
+    instruction: `Estilo: CREATIVO Y MODERNO.
+- Paleta vibrante con gradientes atrevidos (ej: morado → fucsia, o azul eléctrico → verde lima).
+- Tipografía llamativa para títulos (ej: Playfair Display o Space Grotesk de Google Fonts).
+- Layout asimétrico o con formas orgánicas (blobs, diagonales, curvas en secciones).
+- Animaciones CSS suaves en hover (transiciones de color, escala, traslación).
+- Hero con fondo de gradiente animado o patrón geométrico CSS puro.`,
+  },
+];
+
+async function generateLandingPage(description, style) {
+  const message = await client.messages.create({
+    model: "claude-opus-4-6",
+    max_tokens: 8000,
+    messages: [
+      {
+        role: "user",
+        content: BASE_PROMPT(description) + "\n\n" + style.instruction,
+      },
+    ],
+  });
+
+  const rawHtml = message.content[0].type === "text" ? message.content[0].text : "";
+  // Limpiar cualquier bloque de markdown si el modelo los incluye
+  return rawHtml.replace(/^```html\s*/i, "").replace(/```\s*$/, "").trim();
+}
+
 export default async function handler(req, res) {
-  // Configurar cabeceras CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
 
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    return res.status(405).json({ error: 'Method Not Allowed' });
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
   try {
     const { description } = req.body;
-    if (!description) {
-      return res.status(400).json({ error: 'La "description" es obligatoria en el cuerpo de la petición.' });
+    if (!description || !description.trim()) {
+      return res
+        .status(400)
+        .json({ error: 'El campo "description" es obligatorio.' });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      throw new Error("La variable de entorno GEMINI_API_KEY no está configurada.");
+    if (!process.env.ANTHROPIC_API_KEY) {
+      throw new Error("La variable de entorno ANTHROPIC_API_KEY no está configurada.");
     }
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-    // --- Prompts para cada estilo ---
-    const basePrompt = `Eres un experto diseñador y desarrollador web. Tu tarea es generar el código completo para una landing page en un único archivo HTML. El CSS debe estar integrado en la etiqueta <style> dentro del <head>. La página debe ser responsive. No incluyas explicaciones, comentarios, ni bloques de markdown, solo el código HTML puro.
+    // Generar las 3 versiones en paralelo
+    const [minimalista, corporativo, creativo] = await Promise.all(
+      STYLES.map((style) => generateLandingPage(description, style))
+    );
 
-La descripción del negocio es: "${description}"
+    const images = [minimalista, corporativo, creativo];
+    const designs = STYLES.map((style, i) => ({ style: style.name, html: images[i] }));
 
-`;
-
-    const prompts = [
-      {
-        style: "Minimalista",
-        prompt: basePrompt + "El estilo de diseño debe ser estrictamente MINIMALISTA. Usa mucho espacio en blanco, una paleta de colores muy limitada (blanco, negro, grises y un único color de acento), tipografía sans-serif limpia y una estructura muy sencilla y directa."
-      },
-      {
-        style: "Corporativo",
-        prompt: basePrompt + "El estilo de diseño debe ser PROFESIONAL y CORPORATIVO. Usa una estructura clara y ordenada, una paleta de colores seria (azules, grises, blancos), tipografía legible y un enfoque en la confianza y la profesionalidad. Incluye secciones como 'Servicios', 'Sobre Nosotros' y un 'Contacto' claro."
-      },
-      {
-        style: "Creativo",
-        prompt: basePrompt + "El estilo de diseño debe ser CREATIVO y MODERNO. Usa colores vibrantes, tipografías audaces, layouts asimétricos o no convencionales y elementos visuales llamativos. El objetivo es ser memorable y artístico, rompiendo con los esquemas tradicionales."
-      }
-    ];
-
-    // Ejecutar todas las generaciones en paralelo
-    const generationPromises = prompts.map(p => generatePageVersion(genAI, p.prompt));
-
-    const generatedHtmls = await Promise.all(generationPromises);
-
-    // Devolver el JSON con los 3 resultados HTML y sus nombres
-    const designs = generatedHtmls.map((html, i) => ({
-      style: prompts[i].style,
-      html
-    }));
-    return res.status(200).json({ images: generatedHtmls, designs });
+    return res.status(200).json({ images, designs });
 
   } catch (error) {
-    console.error('Error al generar las páginas:', error);
+    console.error("Error al generar las páginas:", error);
+
+    if (error instanceof Anthropic.AuthenticationError) {
+      return res.status(401).json({ error: "API Key de Anthropic inválida o no configurada." });
+    }
+    if (error instanceof Anthropic.RateLimitError) {
+      return res.status(429).json({ error: "Límite de uso de la API alcanzado. Intenta en unos segundos." });
+    }
+
     return res.status(500).json({
-      error: 'Ocurrió un error en el servidor al generar las páginas.',
-      details: error.message
+      error: "Error al generar los diseños.",
+      details: error.message,
     });
   }
 }
