@@ -17,7 +17,7 @@ const cleanApiResponse = (rawText) => {
  * @returns {Promise<string>} Una promesa que se resuelve con el código HTML generado y limpio.
  */
 const generatePageVersion = async (genAI, prompt) => {
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const rawHtml = response.text();
@@ -77,11 +77,15 @@ La descripción del negocio es: "${description}"
 
     // Ejecutar todas las generaciones en paralelo
     const generationPromises = prompts.map(p => generatePageVersion(genAI, p.prompt));
-    
+
     const generatedHtmls = await Promise.all(generationPromises);
 
-    // Devolver el JSON con los 3 resultados HTML
-    return res.status(200).json({ images: generatedHtmls });
+    // Devolver el JSON con los 3 resultados HTML y sus nombres
+    const designs = generatedHtmls.map((html, i) => ({
+      style: prompts[i].style,
+      html
+    }));
+    return res.status(200).json({ images: generatedHtmls, designs });
 
   } catch (error) {
     console.error('Error al generar las páginas:', error);

@@ -406,10 +406,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const generateBtn = document.getElementById('generate-design-button');
     const resultsContainer = document.getElementById('image-results-container');
     const descriptionInput = document.getElementById('businessDescription');
-    const generateText = generateBtn.querySelector('.generate-text');
-    const generatingText = generateBtn.querySelector('.generating-text');
+    const generateText = generateBtn ? generateBtn.querySelector('.generate-text') : null;
+    const generatingText = generateBtn ? generateBtn.querySelector('.generating-text') : null;
 
-    if(generateBtn) {
+    // Almacenamos los HTMLs generados para poder descargarlos
+    let generatedHtmls = [];
+
+    function loadIframe(iframe, html) {
+        iframe.srcdoc = html;
+    }
+
+    function setGeneratingState(isGenerating) {
+        generateBtn.disabled = isGenerating;
+        generateText.classList.toggle('d-none', isGenerating);
+        generatingText.classList.toggle('d-none', !isGenerating);
+    }
+
+    function resetGenerativeModal() {
+        if (descriptionInput) descriptionInput.value = '';
+        resultsContainer.classList.add('d-none');
+        document.getElementById('generative-input-section').classList.remove('d-none');
+        const iframes = resultsContainer.querySelectorAll('.result-iframe');
+        iframes.forEach(iframe => { iframe.srcdoc = ''; });
+        generatedHtmls = [];
+    }
+
+    if (generateBtn) {
         generateBtn.addEventListener('click', async function() {
             const description = descriptionInput.value;
             if (!description.trim()) {
@@ -417,61 +439,83 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // 1. Cambiar al estado de "cargando"
-            generateBtn.disabled = true;
-            generateText.classList.add('d-none');
-            generatingText.classList.remove('d-none');
+            setGeneratingState(true);
             resultsContainer.classList.add('d-none');
 
             try {
-                // 2. Llamar a nuestra función de back-end
                 const response = await fetch('/api/generate-images', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ description: description }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ description }),
                 });
 
                 if (!response.ok) {
-                    throw new Error('La respuesta del servidor no fue exitosa.');
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.details || 'La respuesta del servidor no fue exitosa.');
                 }
 
                 const data = await response.json();
+                generatedHtmls = data.images || [];
 
-                // 3. Mostrar los resultados
-                const resultHolders = resultsContainer.querySelectorAll('.result-image-placeholder');
-                resultHolders.forEach((div, index) => {
-                    div.innerHTML = ''; // Limpiar placeholder
-                    if (data.images[index]) {
-                        // Inyectamos directamente el HTML generado por la IA
-                        div.innerHTML = data.images[index];
+                // Cargar cada HTML en su iframe correspondiente
+                const iframes = resultsContainer.querySelectorAll('.result-iframe');
+                iframes.forEach((iframe, index) => {
+                    if (generatedHtmls[index]) {
+                        loadIframe(iframe, generatedHtmls[index]);
                     }
                 });
+
                 resultsContainer.classList.remove('d-none');
-                showNotification('¡Se han generado tus diseños!', 'success');
+                showNotification('¡Se han generado tus 3 diseños!', 'success');
 
             } catch (error) {
                 console.error('Error al llamar a la función serverless:', error);
-                showNotification('Hubo un error al generar los diseños. Inténtalo de nuevo.', 'danger');
+                showNotification('Error al generar los diseños: ' + error.message, 'danger');
             } finally {
-                // 4. Volver al estado normal del botón
-                generateBtn.disabled = false;
-                generateText.classList.remove('d-none');
-                generatingText.classList.add('d-none');
+                setGeneratingState(false);
             }
         });
     }
 
-    // Limpiar el modal cuando se cierra
-    if(generativeModal) {
-        generativeModal.addEventListener('hidden.bs.modal', function () {
-            descriptionInput.value = '';
+    // Botón de regenerar
+    const regenerateBtn = document.getElementById('regenerate-btn');
+    if (regenerateBtn) {
+        regenerateBtn.addEventListener('click', function() {
             resultsContainer.classList.add('d-none');
-            const resultHolders = resultsContainer.querySelectorAll('.result-image-placeholder');
-            resultHolders.forEach(div => {
-                div.innerHTML = ''; // Limpiar contenido HTML
-            });
         });
+    }
+
+    // Botones de "Ver completo" — abren en nueva pestaña
+    resultsContainer && resultsContainer.addEventListener('click', function(e) {
+        const openBtn = e.target.closest('.open-preview-btn');
+        const downloadBtn = e.target.closest('.download-btn');
+
+        if (openBtn) {
+            const index = parseInt(openBtn.dataset.index);
+            if (generatedHtmls[index]) {
+                const blob = new Blob([generatedHtmls[index]], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+            }
+        }
+
+        if (downloadBtn) {
+            const index = parseInt(downloadBtn.dataset.index);
+            const styleNames = ['minimalista', 'corporativo', 'creativo'];
+            if (generatedHtmls[index]) {
+                const blob = new Blob([generatedHtmls[index]], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `landing-${styleNames[index] || index}.html`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+    });
+
+    // Limpiar el modal cuando se cierra
+    if (generativeModal) {
+        generativeModal.addEventListener('hidden.bs.modal', resetGenerativeModal);
     }
 });

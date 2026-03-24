@@ -16,7 +16,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
     
     <!-- Script crítico simplificado -->
     <script>
@@ -202,38 +202,90 @@
 
 <!-- Modal de Generación IA -->
 <div class="modal fade" id="generativeModal" tabindex="-1" aria-labelledby="generativeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-white border-0">
+            <div class="modal-header border-0 pb-0">
                 <div class="d-flex align-items-center w-100">
-                    <i class="bi bi-magic text-primary me-2" style="font-size:1.8rem;"></i>
-                    <h5 class="modal-title fw-semibold text-dark" id="generativeModalLabel" data-key="generative_modal_title">Genera tu Diseño con IA</h5>
+                    <div class="modal-icon-wrapper me-3">
+                        <i class="bi bi-magic text-primary" style="font-size:1.6rem;"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="generativeModalLabel" data-key="generative_modal_title">Genera tu Diseño con IA</h5>
+                        <small class="text-muted">3 propuestas únicas para tu negocio</small>
+                    </div>
                     <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
             </div>
-            <div class="modal-body bg-white px-4 py-4">
-                <div class="row">
-                    <div class="col-12">
-                        <p class="text-muted" data-key="generative_modal_instruction">Describe tu empresa, producto o idea. Incluye detalles como el estilo que te gusta (moderno, minimalista, etc.), colores y el público al que te diriges. Mientras más detalles, mejores serán los resultados.</p>
-                        <textarea class="form-control form-control-lg border rounded-3 mb-3" id="businessDescription" rows="5" placeholder="Ej: Una cafetería de especialidad en el centro de la ciudad, con un ambiente rústico y acogedor. Busco un diseño web limpio, con colores tierra y fotos grandes de nuestros productos..." data-key="generative_modal_placeholder"></textarea>
-                        
-                        <div id="image-results-container" class="mt-4 d-none">
-                            <h6 class="fw-bold text-center mb-3" data-key="generative_modal_results_title">Aquí tienes algunas ideas:</h6>
-                            <div class="row g-3">
-                                <div class="col-md-4"><div class="result-image-placeholder"></div></div>
-                                <div class="col-md-4"><div class="result-image-placeholder"></div></div>
-                                <div class="col-md-4"><div class="result-image-placeholder"></div></div>
+            <div class="modal-body px-4 py-3">
+                <!-- Paso 1: Input -->
+                <div id="generative-input-section">
+                    <p class="text-muted small mb-3" data-key="generative_modal_instruction">Describe tu empresa, producto o idea. Incluye detalles como el estilo que te gusta (moderno, minimalista, etc.), colores y el público al que te diriges. Mientras más detalles, mejores serán los resultados.</p>
+                    <textarea class="form-control border rounded-3 mb-3" id="businessDescription" rows="4" placeholder="Ej: Una cafetería de especialidad en el centro de la ciudad, con un ambiente rústico y acogedor. Busco un diseño web limpio, con colores tierra y fotos grandes de nuestros productos..." data-key="generative_modal_placeholder"></textarea>
+                    <div class="d-grid">
+                        <button type="button" id="generate-design-button" class="btn btn-primary btn-lg rounded-3 shadow-sm">
+                            <span class="generate-text" data-key="generative_modal_button"><i class="bi bi-stars me-2"></i>Generar Diseños</span>
+                            <span class="generating-text d-none">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span data-key="generative_modal_button_generating">Generando tus diseños...</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Paso 2: Resultados -->
+                <div id="image-results-container" class="mt-4 d-none">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h6 class="fw-bold mb-0" data-key="generative_modal_results_title"><i class="bi bi-check-circle-fill text-success me-2"></i>Aquí tienes tus 3 propuestas:</h6>
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" id="regenerate-btn">
+                            <i class="bi bi-arrow-clockwise me-1"></i>Nueva generación
+                        </button>
+                    </div>
+                    <!-- Resultado 1 -->
+                    <div class="design-result-card mb-4 border rounded-3 overflow-hidden shadow-sm">
+                        <div class="design-result-header d-flex align-items-center justify-content-between px-3 py-2 bg-light border-bottom">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="design-badge badge-minimalista">✦ Minimalista</span>
+                                <small class="text-muted">Limpio y moderno</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-primary rounded-pill open-preview-btn" data-index="0"><i class="bi bi-box-arrow-up-right me-1"></i>Ver completo</button>
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill download-btn" data-index="0"><i class="bi bi-download me-1"></i>Descargar</button>
                             </div>
                         </div>
-
-                        <div class="d-grid mt-4">
-                            <button type="button" id="generate-design-button" class="btn btn-primary btn-lg px-4 rounded-3 shadow-sm">
-                                <span class="generate-text" data-key="generative_modal_button">Generar Diseños</span>
-                                <span class="generating-text d-none">
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    <span data-key="generative_modal_button_generating">Haciendo magia...</span>
-                                </span>
-                            </button>
+                        <div class="design-preview-wrapper">
+                            <iframe class="result-iframe" data-index="0" sandbox="allow-same-origin" scrolling="no" title="Diseño Minimalista"></iframe>
+                        </div>
+                    </div>
+                    <!-- Resultado 2 -->
+                    <div class="design-result-card mb-4 border rounded-3 overflow-hidden shadow-sm">
+                        <div class="design-result-header d-flex align-items-center justify-content-between px-3 py-2 bg-light border-bottom">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="design-badge badge-corporativo">◈ Corporativo</span>
+                                <small class="text-muted">Profesional y confiable</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-primary rounded-pill open-preview-btn" data-index="1"><i class="bi bi-box-arrow-up-right me-1"></i>Ver completo</button>
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill download-btn" data-index="1"><i class="bi bi-download me-1"></i>Descargar</button>
+                            </div>
+                        </div>
+                        <div class="design-preview-wrapper">
+                            <iframe class="result-iframe" data-index="1" sandbox="allow-same-origin" scrolling="no" title="Diseño Corporativo"></iframe>
+                        </div>
+                    </div>
+                    <!-- Resultado 3 -->
+                    <div class="design-result-card mb-2 border rounded-3 overflow-hidden shadow-sm">
+                        <div class="design-result-header d-flex align-items-center justify-content-between px-3 py-2 bg-light border-bottom">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="design-badge badge-creativo">⬡ Creativo</span>
+                                <small class="text-muted">Audaz y memorable</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-primary rounded-pill open-preview-btn" data-index="2"><i class="bi bi-box-arrow-up-right me-1"></i>Ver completo</button>
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill download-btn" data-index="2"><i class="bi bi-download me-1"></i>Descargar</button>
+                            </div>
+                        </div>
+                        <div class="design-preview-wrapper">
+                            <iframe class="result-iframe" data-index="2" sandbox="allow-same-origin" scrolling="no" title="Diseño Creativo"></iframe>
                         </div>
                     </div>
                 </div>
@@ -314,7 +366,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="languages.js"></script>
+    <script src="js/languages.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
